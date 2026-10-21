@@ -1,0 +1,27 @@
+# .NET / C#
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# Flutter / Dart
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+windows/flutter/ephemeral/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+
+# IDE / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
