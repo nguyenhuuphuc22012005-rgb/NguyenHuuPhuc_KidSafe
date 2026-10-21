@@ -7,13 +7,13 @@
 USE master;
 GO
 
-IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'KidSafeDb')
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = 'NguyenHuuPhucDb')
 BEGIN
-    CREATE DATABASE KidSafeDb;
+    CREATE DATABASE NguyenHuuPhucDb;
 END
 GO
 
-USE KidSafeDb;
+USE NguyenHuuPhucDb;
 GO
 
 -- Xóa các bảng cũ nếu tồn tại (theo thứ tự khóa ngoại)
@@ -204,5 +204,5 @@ INSERT INTO dbo.SOSTickets (Id, ChildId, ChildName, ParentName, ParentPhone, Lat
 ('sos_02', 'ch_02', N'Bé Bông (Mai Anh)', N'Nguyễn Hữu Phúc', '0988776655', 10.7725, 106.6980, 52.0, N'Cảnh báo: Bé di chuyển ra khỏi vùng an toàn Trường mầm non', 'resolved', 'usr_staff_01', N'Đã liên hệ phụ huynh, phụ huynh đã đón bé an toàn.');
 GO
 
-PRINT N'✅ Khởi tạo CSDL KidSafeDb trên SQL Server hoàn tất!';
+PRINT N'✅ Khởi tạo CSDL NguyenHuuPhucDb trên SQL Server hoàn tất!';
 GO

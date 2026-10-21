@@ -10,9 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 1. Cấu hình DbContext kết nối SQL Server
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-    ?? "Server=.;Database=KidSafeDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true";
+    ?? "Server=.;Database=NguyenHuuPhucDb;Trusted_Connection=True;TrustServerCertificate=True;MultipleActiveResultSets=true";
 
-builder.Services.AddDbContext<KidSafeDbContext>(options =>
+builder.Services.AddDbContext<NguyenHuuPhucDbContext>(options =>
     options.UseSqlServer(connectionString));
 
 // 2. Đăng ký Services (EmailService, JwtService)
@@ -61,9 +61,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "KidSafe ASP.NET Core Web API",
+        Title = "NguyenHuuPhuc Web API - KidSafe",
         Version = "v1",
-        Description = "Hệ thống Web API quản lý & giám sát điện thoại trẻ em (.NET 9 + SQL Server)"
+        Description = "Hệ thống Web API quản lý & giám sát điện thoại trẻ em (.NET 9 + SQL Server) - Sinh viên: Nguyễn Hữu Phúc"
     });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -97,7 +97,7 @@ var app = builder.Build();
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/swagger/v1/swagger.json", "KidSafe API v1");
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "NguyenHuuPhuc API v1");
     c.RoutePrefix = "swagger";
 });
 
@@ -111,14 +111,16 @@ app.MapControllers();
 // Root ping
 app.MapGet("/", () => Results.Ok(new
 {
-    service = "KidSafe ASP.NET Core Web API",
+    service = "NguyenHuuPhuc ASP.NET Core Web API - KidSafe",
+    author = "Nguyễn Hữu Phúc",
     status = "running",
-    database = "Microsoft SQL Server",
+    database = "Microsoft SQL Server (NguyenHuuPhucDb)",
     swagger_docs = "/swagger"
 }));
 
 Console.WriteLine("==========================================================");
-Console.WriteLine("🛡️  KIDSAFE ASP.NET CORE WEB API (.NET 9 + SQL SERVER)  ");
+Console.WriteLine("🛡️  NGUYEN HUU PHUC - KIDSAFE WEB API (.NET 9 + SQL SERVER)");
+Console.WriteLine("    Database: NguyenHuuPhucDb                             ");
 Console.WriteLine("    Swagger UI: http://localhost:8000/swagger             ");
 Console.WriteLine("==========================================================");
 

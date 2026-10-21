@@ -3,9 +3,9 @@ using KidSafe.Api.Models;
 
 namespace KidSafe.Api.Data
 {
-    public class KidSafeDbContext : DbContext
+    public class NguyenHuuPhucDbContext : DbContext
     {
-        public KidSafeDbContext(DbContextOptions<KidSafeDbContext> options) : base(options)
+        public NguyenHuuPhucDbContext(DbContextOptions<NguyenHuuPhucDbContext> options) : base(options)
         {
         }
 

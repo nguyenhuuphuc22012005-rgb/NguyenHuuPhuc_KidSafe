@@ -11,8 +11,8 @@ echo                     DỰ ÁN: KIDSAFE
 echo       Kiến trúc: ASP.NET Core 9 API + SQL Server 2022 + Flutter Mobile
 echo ======================================================================
 echo.
-echo   [1] Khởi động ASP.NET Core 9 Web API (:8000) (Chuẩn Báo Cáo & Sơ Đồ)
-echo   [2] Khởi tạo CSDL SQL Server (KidSafeDb qua sqlcmd)
+echo   [1] Khởi động ASP.NET Core 9 Web API (:8000) (NguyenHuuPhuc.Api)
+echo   [2] Khởi tạo CSDL SQL Server (NguyenHuuPhucDb qua sqlcmd)
 echo   [3] Khởi động Mobile App KidSafe trên Windows Desktop
 echo   [4] Khởi động Mobile App KidSafe trên Web Chrome
 echo   [5] Khởi động Python FastAPI Server (Dự phòng)
@@ -43,10 +43,10 @@ goto MENU
 
 :INIT_SQL
 cls
-echo Đang nạp cơ sở dữ liệu vào SQL Server...
-sqlcmd -S . -E -i Database\NguyenHuuPhuc_KidSafe.sql
+echo Đang nạp cơ sở dữ liệu vào SQL Server (NguyenHuuPhucDb)...
+sqlcmd -S . -E -i Database\NguyenHuuPhuc.sql
 echo.
-echo Hoàn tất nạp CSDL KidSafeDb!
+echo Hoàn tất nạp CSDL NguyenHuuPhucDb!
 pause
 goto MENU
 

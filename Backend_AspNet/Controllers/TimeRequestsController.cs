@@ -13,9 +13,9 @@ namespace KidSafe.Api.Controllers
     [Route("api/time-requests")]
     public class TimeRequestsController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
+        private readonly NguyenHuuPhucDbContext _db;
 
-        public TimeRequestsController(KidSafeDbContext db)
+        public TimeRequestsController(NguyenHuuPhucDbContext db)
         {
             _db = db;
         }

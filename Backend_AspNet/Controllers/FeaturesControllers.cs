@@ -13,8 +13,8 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class GeofencesController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
-        public GeofencesController(KidSafeDbContext db) => _db = db;
+        private readonly NguyenHuuPhucDbContext _db;
+        public GeofencesController(NguyenHuuPhucDbContext db) => _db = db;
 
         [HttpGet]
         public async Task<IActionResult> GetGeofences([FromQuery] string? child_id)
@@ -68,8 +68,8 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class SchedulesController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
-        public SchedulesController(KidSafeDbContext db) => _db = db;
+        private readonly NguyenHuuPhucDbContext _db;
+        public SchedulesController(NguyenHuuPhucDbContext db) => _db = db;
 
         [HttpGet]
         public async Task<IActionResult> GetSchedules([FromQuery] string? child_id)
@@ -122,8 +122,8 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class ContactsController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
-        public ContactsController(KidSafeDbContext db) => _db = db;
+        private readonly NguyenHuuPhucDbContext _db;
+        public ContactsController(NguyenHuuPhucDbContext db) => _db = db;
 
         [HttpGet]
         public async Task<IActionResult> GetContacts([FromQuery] string? child_id)
@@ -175,8 +175,8 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class NoiseController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
-        public NoiseController(KidSafeDbContext db) => _db = db;
+        private readonly NguyenHuuPhucDbContext _db;
+        public NoiseController(NguyenHuuPhucDbContext db) => _db = db;
 
         [HttpGet]
         public async Task<IActionResult> GetLogs([FromQuery] string? child_id)
@@ -201,8 +201,8 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class SosController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
-        public SosController(KidSafeDbContext db) => _db = db;
+        private readonly NguyenHuuPhucDbContext _db;
+        public SosController(NguyenHuuPhucDbContext db) => _db = db;
 
         [HttpGet]
         public async Task<IActionResult> GetTickets()
@@ -240,8 +240,8 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
-        public UsersController(KidSafeDbContext db) => _db = db;
+        private readonly NguyenHuuPhucDbContext _db;
+        public UsersController(NguyenHuuPhucDbContext db) => _db = db;
 
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery] string? role)

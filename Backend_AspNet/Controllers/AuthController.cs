@@ -14,14 +14,14 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
+        private readonly NguyenHuuPhucDbContext _db;
         private readonly IEmailService _emailService;
         private readonly IJwtService _jwtService;
 
         // Lưu trữ tạm mã OTP trong bộ nhớ: {email: (otp, expiresAt)}
         private static readonly ConcurrentDictionary<string, (string Otp, DateTime ExpiresAt)> OtpStore = new();
 
-        public AuthController(KidSafeDbContext db, IEmailService emailService, IJwtService jwtService)
+        public AuthController(NguyenHuuPhucDbContext db, IEmailService emailService, IJwtService jwtService)
         {
             _db = db;
             _emailService = emailService;

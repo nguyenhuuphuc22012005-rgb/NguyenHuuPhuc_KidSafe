@@ -13,9 +13,9 @@ namespace KidSafe.Api.Controllers
     [Route("api/[controller]")]
     public class ChildrenController : ControllerBase
     {
-        private readonly KidSafeDbContext _db;
+        private readonly NguyenHuuPhucDbContext _db;
 
-        public ChildrenController(KidSafeDbContext db)
+        public ChildrenController(NguyenHuuPhucDbContext db)
         {
             _db = db;
         }
