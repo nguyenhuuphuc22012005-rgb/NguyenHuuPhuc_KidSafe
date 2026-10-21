@@ -1,9 +1,11 @@
 import sqlite3
 import os
 
-DB_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "Database"))
+BACKEND_DIR = os.path.dirname(__file__)
+KIDSAFE_DB = os.path.join(BACKEND_DIR, "kidsafe.db")
+DB_DIR = os.path.abspath(os.path.join(BACKEND_DIR, "..", "Database"))
 os.makedirs(DB_DIR, exist_ok=True)
-DB_PATH = os.path.join(DB_DIR, "NguyenHuuPhuc.db")
+DB_PATH = KIDSAFE_DB if os.path.exists(KIDSAFE_DB) else os.path.join(DB_DIR, "NguyenHuuPhuc.db")
 
 def get_db():
     conn = sqlite3.connect(DB_PATH)
