@@ -32,10 +32,10 @@ def seed_initial_data():
     if count == 0:
         # Tạo Admin (Nguyễn Hữu Phúc), Staff, Parent, Child mẫu
         users = [
-            ("usr_admin_01", "Nguyễn Hữu Phúc (Admin)", "nguyenhuuphuc22012005@gmail.com", "phuc2201", "0901234567", "admin", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"),
-            ("usr_parent_01", "Nguyễn Hữu Phúc (Phụ Huynh)", "parent@kidsafe.vn", "123456", "0988776655", "parent", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150"),
+            ("usr_admin_01", "Nguyễn Hữu Phúc", "nguyenhuuphuc22012005@gmail.com", "phuc2201", "0901234567", "admin", "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150"),
+            ("usr_parent_01", "Nguyễn Hữu Phúc", "parent@kidsafe.vn", "123456", "0988776655", "parent", "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150"),
             ("usr_child_01", "Bé Bo (Thiết Bị Con)", "child@kidsafe.vn", "123456", "0911223344", "child", "https://images.unsplash.com/photo-1543332164-6e82f355badc?w=150"),
-            ("usr_staff_01", "Chuyên Viên An Toàn (Staff)", "staff@kidsafe.vn", "123456", "0909876543", "staff", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"),
+            ("usr_staff_01", "Nguyễn Hữu Phúc", "staff@kidsafe.vn", "123456", "0909876543", "staff", "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"),
         ]
         cursor.executemany("INSERT INTO users (id, name, email, password, phone, role, avatar) VALUES (?, ?, ?, ?, ?, ?, ?)", users)
 
@@ -73,7 +73,7 @@ def seed_initial_data():
 
         # Tạo Danh bạ an toàn mẫu (Contacts)
         contacts = [
-            ("con_01", "ch_01", "Bố (Nguyễn Hữu Phúc)", "0988776655", "Bố", 1, "avatar_dad"),
+            ("con_01", "ch_01", "Nguyễn Hữu Phúc", "0988776655", "Bố", 1, "avatar_dad"),
             ("con_02", "ch_01", "Mẹ (Trần Thị Mai)", "0977889900", "Mẹ", 1, "avatar_mom"),
             ("con_03", "ch_01", "Cô Lan (Chủ nhiệm lớp 3A)", "0933445566", "Giáo viên", 0, "avatar_teacher"),
             ("con_04", "ch_01", "Cảnh Sát Khẩn Cấp 113", "113", "Khẩn cấp", 1, "avatar_police"),

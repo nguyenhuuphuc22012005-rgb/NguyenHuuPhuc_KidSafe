@@ -42,7 +42,7 @@ class MockDataService {
     users = [
       UserModel(
         id: 'usr_admin_01',
-        name: 'Nguyễn Hữu Phúc (Admin)',
+        name: 'Nguyễn Hữu Phúc',
         email: 'nguyenhuuphuc22012005@gmail.com',
         phone: '0901234567',
         role: 'admin',
@@ -50,7 +50,7 @@ class MockDataService {
       ),
       UserModel(
         id: 'usr_parent_01',
-        name: 'Nguyễn Hữu Phúc (Phụ Huynh)',
+        name: 'Nguyễn Hữu Phúc',
         email: 'parent@kidsafe.vn',
         phone: '0988776655',
         role: 'parent',
@@ -66,7 +66,7 @@ class MockDataService {
       ),
       UserModel(
         id: 'usr_staff_01',
-        name: 'Chuyên Viên Cứu Hộ (Staff)',
+        name: 'Nguyễn Hữu Phúc',
         email: 'staff@kidsafe.vn',
         phone: '0909876543',
         role: 'staff',
@@ -190,7 +190,7 @@ class MockDataService {
       ContactModel(
         id: 'con_01',
         childId: 'ch_01',
-        name: 'Bố (Nguyễn Hữu Phúc)',
+        name: 'Nguyễn Hữu Phúc',
         phone: '0988776655',
         relationship: 'Bố',
         isSosContact: true,
