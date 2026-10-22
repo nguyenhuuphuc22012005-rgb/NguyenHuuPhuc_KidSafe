@@ -44,7 +44,7 @@ goto MENU
 :INIT_SQL
 cls
 echo Đang nạp cơ sở dữ liệu vào SQL Server (NguyenHuuPhucDb)...
-sqlcmd -S . -E -i Database\NguyenHuuPhuc.sql
+sqlcmd -S . -E -f 65001 -i Database\NguyenHuuPhuc.sql
 echo.
 echo Hoàn tất nạp CSDL NguyenHuuPhucDb!
 pause

@@ -375,12 +375,16 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Text(
-                                    '${req.childName} xin thêm +${req.requestedMinutes} phút',
-                                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                                  Expanded(
+                                    child: Text(
+                                      '${req.childName} xin thêm +${req.requestedMinutes} phút',
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textDark),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
+                                  const SizedBox(width: 8),
                                   Text(
                                     req.createdAt.isNotEmpty && req.createdAt.length >= 5 ? req.createdAt.substring(req.createdAt.length - 5) : 'Vừa xong',
                                     style: const TextStyle(fontSize: 11, color: AppTheme.textMuted),
@@ -448,16 +452,23 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Row(
-                          children: [
-                            const Icon(Icons.sensors_rounded, color: AppTheme.accent, size: 20),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Trạng Thái: ${child.name}',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                            ),
-                          ],
+                        Expanded(
+                          child: Row(
+                            children: [
+                              const Icon(Icons.sensors_rounded, color: AppTheme.accent, size: 20),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Trạng Thái: ${child.name}',
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 8),
                         InkWell(
                           onTap: () {
                             Navigator.push(
