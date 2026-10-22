@@ -6,8 +6,22 @@ import '../../providers/schedule_provider.dart';
 import '../../theme/app_theme.dart';
 import 'schedule_form_screen.dart';
 
-class ScheduleListScreen extends StatelessWidget {
+class ScheduleListScreen extends StatefulWidget {
   const ScheduleListScreen({super.key});
+
+  @override
+  State<ScheduleListScreen> createState() => _ScheduleListScreenState();
+}
+
+class _ScheduleListScreenState extends State<ScheduleListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final childId = Provider.of<ChildrenProvider>(context, listen: false).selectedChild?.id ?? 'ch_01';
+      Provider.of<ScheduleProvider>(context, listen: false).loadSchedules(childId);
+    });
+  }
 
   void _confirmDelete(BuildContext context, ScheduleModel sch) {
     showDialog(

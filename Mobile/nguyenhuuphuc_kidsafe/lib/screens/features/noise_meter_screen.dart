@@ -724,24 +724,27 @@ class _NoiseMeterScreenState extends State<NoiseMeterScreen> {
               border: Border.all(color: const Color(0xFFE2E8F0)),
             ),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    Icon(Icons.notifications_active_rounded, size: 16, color: thresholdColor),
-                    const SizedBox(width: 8),
-                    const Text('Ngưỡng Cảnh Báo:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: thresholdColor.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${threshold.toStringAsFixed(0)} dB ($thresholdLabel)',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: thresholdColor),
+                Icon(Icons.notifications_active_rounded, size: 16, color: thresholdColor),
+                const SizedBox(width: 8),
+                const Text('Ngưỡng Cảnh Báo:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: thresholdColor.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        '${threshold.toStringAsFixed(0)} dB ($thresholdLabel)',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: thresholdColor),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ),
                 ),
               ],

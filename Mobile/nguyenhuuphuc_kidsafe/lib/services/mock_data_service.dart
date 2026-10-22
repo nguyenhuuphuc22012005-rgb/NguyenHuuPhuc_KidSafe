@@ -8,12 +8,14 @@ import '../models/contact_model.dart';
 import '../models/noise_log_model.dart';
 import '../models/sos_ticket_model.dart';
 import '../models/time_request_model.dart';
+import 'storage_service.dart';
 
 class MockDataService {
   static final MockDataService _instance = MockDataService._internal();
   factory MockDataService() => _instance;
   MockDataService._internal() {
     _initData();
+    _loadFromStorage();
   }
 
   final _uuid = const Uuid();
@@ -398,6 +400,35 @@ class MockDataService {
     return schedules.where((s) => s.childId == childId).toList();
   }
 
+  Future<void> _loadFromStorage() async {
+    try {
+      final savedSchs = await StorageService.getSchedules();
+      if (savedSchs != null && savedSchs.isNotEmpty) {
+        schedules = savedSchs.map((e) => ScheduleModel.fromJson(e)).toList();
+      }
+      final savedCons = await StorageService.getContacts();
+      if (savedCons != null && savedCons.isNotEmpty) {
+        contacts = savedCons.map((e) => ContactModel.fromJson(e)).toList();
+      }
+      final savedReqs = await StorageService.getTimeRequests();
+      if (savedReqs != null && savedReqs.isNotEmpty) {
+        timeRequests = savedReqs.map((e) => TimeRequestModel.fromJson(e)).toList();
+      }
+    } catch (_) {}
+  }
+
+  void _saveSchedules() {
+    StorageService.saveSchedules(schedules.map((s) => s.toJson()).toList());
+  }
+
+  void _saveContacts() {
+    StorageService.saveContacts(contacts.map((c) => c.toJson()).toList());
+  }
+
+  void saveTimeRequestsToStorage() {
+    StorageService.saveTimeRequests(timeRequests.map((r) => r.toJson()).toList());
+  }
+
   ScheduleModel createSchedule({
     required String childId,
     required String title,
@@ -416,6 +447,7 @@ class MockDataService {
       blockApps: blockApps,
     );
     schedules.add(newSch);
+    _saveSchedules();
     return newSch;
   }
 
@@ -423,11 +455,13 @@ class MockDataService {
     final idx = schedules.indexWhere((s) => s.id == updated.id);
     if (idx != -1) {
       schedules[idx] = updated;
+      _saveSchedules();
     }
   }
 
   void deleteSchedule(String id) {
     schedules.removeWhere((s) => s.id == id);
+    _saveSchedules();
   }
 
   // --- CONTACTS CRUD ---
@@ -453,6 +487,7 @@ class MockDataService {
       avatar: avatar,
     );
     contacts.add(newCon);
+    _saveContacts();
     return newCon;
   }
 
@@ -460,11 +495,13 @@ class MockDataService {
     final idx = contacts.indexWhere((c) => c.id == updated.id);
     if (idx != -1) {
       contacts[idx] = updated;
+      _saveContacts();
     }
   }
 
   void deleteContact(String id) {
     contacts.removeWhere((c) => c.id == id);
+    _saveContacts();
   }
 
   // --- NOISE LOGS (Feature d) ---

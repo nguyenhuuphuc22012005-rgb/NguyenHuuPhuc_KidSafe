@@ -16,26 +16,33 @@ class ApiService {
 
   final MockDataService _mock = MockDataService();
 
-  static const List<String> _candidateHosts = [
-    'http://127.0.0.1:8000',
-    'http://192.168.1.6:8000',
-    'http://192.168.1.4:8000',
-    'http://10.0.2.2:8000',
-  ];
-  String _activeBaseUrl = 'http://127.0.0.1:8000';
+  String _activeBaseUrl = 'http://192.168.1.4:8000';
 
   String get baseUrl => _activeBaseUrl;
 
-  Future<http.Response> _post(String path, Map<String, dynamic> body, {Duration timeout = const Duration(seconds: 4)}) async {
-    final candidateHosts = [
+  List<String> _getCandidateHosts() {
+    return [
       _activeBaseUrl,
-      'http://127.0.0.1:8000',
-      'http://192.168.1.6:8000',
       'http://192.168.1.4:8000',
+      'http://127.0.0.1:8000',
       'http://10.0.2.2:8000',
+      'http://192.168.1.6:8000',
     ].toSet().toList();
+  }
 
-    for (final host in candidateHosts) {
+  Future<http.Response> _get(String path, {Duration timeout = const Duration(seconds: 3)}) async {
+    for (final host in _getCandidateHosts()) {
+      try {
+        final res = await http.get(Uri.parse('$host$path')).timeout(timeout);
+        _activeBaseUrl = host;
+        return res;
+      } catch (_) {}
+    }
+    throw Exception('Không thể kết nối đến Backend KidSafe!');
+  }
+
+  Future<http.Response> _post(String path, Map<String, dynamic> body, {Duration timeout = const Duration(seconds: 4)}) async {
+    for (final host in _getCandidateHosts()) {
       try {
         final res = await http.post(
           Uri.parse('$host$path'),
@@ -47,6 +54,32 @@ class ApiService {
       } catch (_) {}
     }
     throw Exception('Không thể kết nối đến Backend KidSafe (vui lòng đảm bảo server đang chạy)!');
+  }
+
+  Future<http.Response> _put(String path, Map<String, dynamic> body, {Duration timeout = const Duration(seconds: 3)}) async {
+    for (final host in _getCandidateHosts()) {
+      try {
+        final res = await http.put(
+          Uri.parse('$host$path'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(body),
+        ).timeout(timeout);
+        _activeBaseUrl = host;
+        return res;
+      } catch (_) {}
+    }
+    throw Exception('Không thể kết nối đến Backend KidSafe!');
+  }
+
+  Future<http.Response> _delete(String path, {Duration timeout = const Duration(seconds: 3)}) async {
+    for (final host in _getCandidateHosts()) {
+      try {
+        final res = await http.delete(Uri.parse('$host$path')).timeout(timeout);
+        _activeBaseUrl = host;
+        return res;
+      } catch (_) {}
+    }
+    throw Exception('Không thể kết nối đến Backend KidSafe!');
   }
 
   // --- AUTH & OTP ---
@@ -316,7 +349,7 @@ class ApiService {
   // --- SCHEDULES CRUD ---
   Future<List<ScheduleModel>> getSchedules(String childId) async {
     try {
-      final res = await http.get(Uri.parse('$baseUrl/api/schedules?child_id=$childId')).timeout(const Duration(seconds: 2));
+      final res = await _get('/api/schedules?child_id=$childId', timeout: const Duration(seconds: 3));
       if (res.statusCode == 200) {
         final List data = jsonDecode(utf8.decode(res.bodyBytes));
         return data.map((e) => ScheduleModel.fromJson(e)).toList();
@@ -327,11 +360,13 @@ class ApiService {
 
   Future<ScheduleModel> createSchedule(ScheduleModel sch) async {
     try {
-      await http.post(
-        Uri.parse('$baseUrl/api/schedules'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(sch.toJson()),
-      ).timeout(const Duration(seconds: 2));
+      final res = await _post('/api/schedules', sch.toJson(), timeout: const Duration(seconds: 3));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        final created = ScheduleModel.fromJson(data);
+        _mock.schedules.insert(0, created);
+        return created;
+      }
     } catch (_) {}
     return _mock.createSchedule(
       childId: sch.childId,
@@ -345,18 +380,14 @@ class ApiService {
 
   Future<void> updateSchedule(ScheduleModel sch) async {
     try {
-      await http.put(
-        Uri.parse('$baseUrl/api/schedules/${sch.id}'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(sch.toJson()),
-      ).timeout(const Duration(seconds: 2));
+      await _put('/api/schedules/${sch.id}', sch.toJson(), timeout: const Duration(seconds: 3));
     } catch (_) {}
     _mock.updateSchedule(sch);
   }
 
   Future<void> deleteSchedule(String id) async {
     try {
-      await http.delete(Uri.parse('$baseUrl/api/schedules/$id')).timeout(const Duration(seconds: 2));
+      await _delete('/api/schedules/$id', timeout: const Duration(seconds: 3));
     } catch (_) {}
     _mock.deleteSchedule(id);
   }
@@ -364,7 +395,7 @@ class ApiService {
   // --- CONTACTS CRUD ---
   Future<List<ContactModel>> getContacts(String childId) async {
     try {
-      final res = await http.get(Uri.parse('$baseUrl/api/contacts?child_id=$childId')).timeout(const Duration(seconds: 2));
+      final res = await _get('/api/contacts?child_id=$childId', timeout: const Duration(seconds: 3));
       if (res.statusCode == 200) {
         final List data = jsonDecode(utf8.decode(res.bodyBytes));
         return data.map((e) => ContactModel.fromJson(e)).toList();
@@ -375,11 +406,13 @@ class ApiService {
 
   Future<ContactModel> createContact(ContactModel con) async {
     try {
-      await http.post(
-        Uri.parse('$baseUrl/api/contacts'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(con.toJson()),
-      ).timeout(const Duration(seconds: 2));
+      final res = await _post('/api/contacts', con.toJson(), timeout: const Duration(seconds: 3));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        final created = ContactModel.fromJson(data);
+        _mock.contacts.insert(0, created);
+        return created;
+      }
     } catch (_) {}
     return _mock.createContact(
       childId: con.childId,
@@ -393,18 +426,14 @@ class ApiService {
 
   Future<void> updateContact(ContactModel con) async {
     try {
-      await http.put(
-        Uri.parse('$baseUrl/api/contacts/${con.id}'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(con.toJson()),
-      ).timeout(const Duration(seconds: 2));
+      await _put('/api/contacts/${con.id}', con.toJson(), timeout: const Duration(seconds: 3));
     } catch (_) {}
     _mock.updateContact(con);
   }
 
   Future<void> deleteContact(String id) async {
     try {
-      await http.delete(Uri.parse('$baseUrl/api/contacts/$id')).timeout(const Duration(seconds: 2));
+      await _delete('/api/contacts/$id', timeout: const Duration(seconds: 3));
     } catch (_) {}
     _mock.deleteContact(id);
   }
@@ -522,14 +551,17 @@ class ApiService {
   // --- YÊU CẦU XIN THÊM THỜI GIAN & DUYỆT YÊU CẦU (ASP.NET CORE & SQL SERVER) ---
   Future<List<TimeRequestModel>> getTimeRequests({String? parentId, String? childId}) async {
     try {
-      var url = '$baseUrl/api/time-requests';
-      if (parentId != null) url += '?parent_id=$parentId';
-      else if (childId != null) url += '?child_id=$childId';
+      var path = '/api/time-requests';
+      if (parentId != null) path += '?parent_id=$parentId';
+      else if (childId != null) path += '?child_id=$childId';
 
-      final res = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 2));
+      final res = await _get(path, timeout: const Duration(seconds: 3));
       if (res.statusCode == 200) {
         final List list = jsonDecode(utf8.decode(res.bodyBytes));
-        return list.map((e) => TimeRequestModel.fromJson(e)).toList();
+        final result = list.map((e) => TimeRequestModel.fromJson(e)).toList();
+        _mock.timeRequests = result;
+        _mock.saveTimeRequestsToStorage();
+        return result;
       }
     } catch (_) {}
     return _mock.timeRequests;
@@ -545,19 +577,18 @@ class ApiService {
   }) async {
     final int mins = requestedMinutes ?? minutes ?? 30;
     try {
-      final res = await http.post(
-        Uri.parse('$baseUrl/api/time-requests'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'childId': childId,
-          'minutesRequested': mins,
-          'reason': reason,
-        }),
-      ).timeout(const Duration(seconds: 3));
+      final res = await _post('/api/time-requests', {
+        'childId': childId,
+        'minutesRequested': mins,
+        'reason': reason,
+      }, timeout: const Duration(seconds: 3));
 
       if (res.statusCode == 200) {
         final data = jsonDecode(utf8.decode(res.bodyBytes));
-        return TimeRequestModel.fromJson(data['request']);
+        final created = TimeRequestModel.fromJson(data['request']);
+        _mock.timeRequests.insert(0, created);
+        _mock.saveTimeRequestsToStorage();
+        return created;
       }
     } catch (_) {}
 
@@ -571,6 +602,7 @@ class ApiService {
       createdAt: 'Vừa xong',
     );
     _mock.timeRequests.insert(0, req);
+    _mock.saveTimeRequestsToStorage();
     return req;
   }
 
@@ -582,15 +614,27 @@ class ApiService {
   }) async {
     final finalStatus = status ?? (isApproved == true ? 'approved' : 'rejected');
     try {
-      final res = await http.put(
-        Uri.parse('$baseUrl/api/time-requests/$requestId/review'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'status': finalStatus,
-          'reviewedBy': reviewer,
-        }),
-      ).timeout(const Duration(seconds: 3));
-      if (res.statusCode == 200) return true;
+      final res = await _put('/api/time-requests/$requestId/review', {
+        'status': finalStatus,
+        'reviewedBy': reviewer,
+      }, timeout: const Duration(seconds: 3));
+      if (res.statusCode == 200) {
+        final idx = _mock.timeRequests.indexWhere((r) => r.id == requestId);
+        if (idx != -1) {
+          final old = _mock.timeRequests[idx];
+          _mock.timeRequests[idx] = TimeRequestModel(
+            id: old.id,
+            childId: old.childId,
+            childName: old.childName,
+            minutesRequested: old.minutesRequested,
+            reason: old.reason,
+            status: finalStatus,
+            createdAt: old.createdAt,
+          );
+          _mock.saveTimeRequestsToStorage();
+        }
+        return true;
+      }
     } catch (_) {}
 
     final idx = _mock.timeRequests.indexWhere((r) => r.id == requestId);
@@ -605,6 +649,7 @@ class ApiService {
         status: finalStatus,
         createdAt: old.createdAt,
       );
+      _mock.saveTimeRequestsToStorage();
     }
     return true;
   }

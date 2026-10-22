@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
@@ -30,11 +31,16 @@ class ParentHomeScreen extends StatefulWidget {
 
 class _ParentHomeScreenState extends State<ParentHomeScreen> {
   List<TimeRequestModel> _pendingTimeRequests = [];
+  Timer? _pollTimer;
 
   @override
   void initState() {
     super.initState();
     _loadTimeRequests();
+    // Tự động kiểm tra yêu cầu mới từ điện thoại con mỗi 3 giây theo thời gian thực
+    _pollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      _loadTimeRequests();
+    });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final childrenProvider = Provider.of<ChildrenProvider>(context, listen: false);
       if (childrenProvider.selectedChild != null) {
@@ -42,6 +48,12 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
             .loadGeofences(childrenProvider.selectedChild!.id);
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
   }
 
   Future<void> _loadTimeRequests() async {
@@ -56,6 +68,12 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
   }
 
   Future<void> _reviewRequest(TimeRequestModel req, bool isApproved) async {
+    // 1. Biến mất tức thì khỏi màn hình phụ huynh (không chờ mạng phản hồi)
+    setState(() {
+      _pendingTimeRequests.removeWhere((r) => r.id == req.id);
+    });
+
+    // 2. Gửi xác nhận lên backend / lưu trạng thái
     await ApiService().reviewTimeRequest(requestId: req.id, isApproved: isApproved);
     if (!mounted) return;
 
@@ -70,6 +88,7 @@ class _ParentHomeScreenState extends State<ParentHomeScreen> {
             ? '✅ Đã duyệt cho ${req.childName} thêm ${req.requestedMinutes} phút dùng máy!'
             : '❌ Đã từ chối yêu cầu xin thêm giờ của ${req.childName}.'),
         backgroundColor: isApproved ? AppTheme.accent : AppTheme.danger,
+        duration: const Duration(seconds: 2),
       ),
     );
 

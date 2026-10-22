@@ -137,6 +137,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     // Vai trò (Chỉ cho phép Phụ Huynh hoặc Con)
                     DropdownButtonFormField<String>(
                       value: _selectedRole,
+                      isExpanded: true,
                       decoration: const InputDecoration(
                         labelText: 'Vai trò người dùng *',
                         prefixIcon: Icon(Icons.badge_outlined, size: 20),

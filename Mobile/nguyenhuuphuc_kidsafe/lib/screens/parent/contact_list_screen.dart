@@ -6,8 +6,22 @@ import '../../providers/contact_provider.dart';
 import '../../theme/app_theme.dart';
 import 'contact_form_screen.dart';
 
-class ContactListScreen extends StatelessWidget {
+class ContactListScreen extends StatefulWidget {
   const ContactListScreen({super.key});
+
+  @override
+  State<ContactListScreen> createState() => _ContactListScreenState();
+}
+
+class _ContactListScreenState extends State<ContactListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final childId = Provider.of<ChildrenProvider>(context, listen: false).selectedChild?.id ?? 'ch_01';
+      Provider.of<ContactProvider>(context, listen: false).loadContacts(childId);
+    });
+  }
 
   void _confirmDelete(BuildContext context, ContactModel con) {
     showDialog(

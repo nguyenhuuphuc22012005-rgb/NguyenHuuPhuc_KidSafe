@@ -114,6 +114,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
                 value: _relationship,
+                isExpanded: true,
                 decoration: const InputDecoration(
                   labelText: 'Mối quan hệ *',
                   prefixIcon: Icon(Icons.group_outlined),
@@ -124,7 +125,7 @@ class _ContactFormScreenState extends State<ContactFormScreen> {
                   DropdownMenuItem(value: 'Ông/Bà', child: Text('Ông / Bà')),
                   DropdownMenuItem(value: 'Giáo viên', child: Text('Thầy / Cô giáo chủ nhiệm')),
                   DropdownMenuItem(value: 'Người thân', child: Text('Người thân / Anh chị')),
-                  DropdownMenuItem(value: 'Khẩn cấp', child: Text('Cảnh sát / Cứu thương khẩn cấp')),
+                  DropdownMenuItem(value: 'Khẩn cấp', child: Text('Cảnh sát / Cứu thương')),
                 ],
                 onChanged: (val) => setState(() => _relationship = val ?? 'Bố'),
               ),

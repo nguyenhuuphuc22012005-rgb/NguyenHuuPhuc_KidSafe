@@ -58,6 +58,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: role,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Phân quyền *'),
                   items: const [
                     DropdownMenuItem(value: 'parent', child: Text('Phụ huynh (Khách hàng)')),
@@ -124,6 +125,7 @@ class _UserManagementScreenState extends State<UserManagementScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<String>(
                   value: role,
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Phân quyền'),
                   items: const [
                     DropdownMenuItem(value: 'parent', child: Text('Phụ huynh (Khách hàng)')),
