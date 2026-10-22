@@ -114,8 +114,8 @@ class _ChildDeviceScreenState extends State<ChildDeviceScreen> {
   }
 
   void _startChildNoiseMonitoring() {
-    _noiseService.startMonitoring();
     _noiseService.addListener(_onNoiseChanged);
+    _noiseService.enableRealMicrophone();
   }
 
   void _onNoiseChanged(double db, NoiseLevelCategory cat) {
@@ -604,27 +604,98 @@ class _ChildDeviceScreenState extends State<ChildDeviceScreen> {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF0FDF4),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: const Color(0xFF10B981)),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.sensors_rounded, size: 13, color: Color(0xFF059669)),
-                            SizedBox(width: 4),
-                            Text(
-                              'Đang phát',
-                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Color(0xFF047857)),
-                            ),
-                          ],
+                      InkWell(
+                        onTap: () async {
+                          final ok = await _noiseService.enableRealMicrophone();
+                          if (mounted) {
+                            setState(() {});
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(ok
+                                    ? '🟢 Đã kết nối Micro phần cứng điện thoại thành công!'
+                                    : '⚠️ Cần cho phép quyền Micro trong Cài đặt của máy.'),
+                                backgroundColor: ok ? AppTheme.accent : AppTheme.warning,
+                              ),
+                            );
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: _noiseService.isRealMicrophone ? const Color(0xFFF0FDF4) : const Color(0xFFFEF3C7),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: _noiseService.isRealMicrophone ? const Color(0xFF10B981) : const Color(0xFFF59E0B)),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                _noiseService.isRealMicrophone ? Icons.mic_rounded : Icons.mic_off_rounded,
+                                size: 13,
+                                color: _noiseService.isRealMicrophone ? const Color(0xFF059669) : const Color(0xFFD97706),
+                              ),
+                              const SizedBox(width: 4),
+                              Text(
+                                _noiseService.isRealMicrophone ? 'Micro Thật' : 'Chưa nhận Mic',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: _noiseService.isRealMicrophone ? const Color(0xFF047857) : const Color(0xFFB45309),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
                   ),
+                  if (!_noiseService.isRealMicrophone) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFFBEB),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: const Color(0xFFFDE68A)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.info_outline_rounded, color: Color(0xFFD97706), size: 18),
+                          const SizedBox(width: 8),
+                          const Expanded(
+                            child: Text(
+                              'Đang giả lập. Nhấn nút để kích hoạt Micro thật của điện thoại:',
+                              style: TextStyle(fontSize: 11, color: Color(0xFF92400E)),
+                            ),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(
+                              backgroundColor: const Color(0xFFD97706),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              minimumSize: Size.zero,
+                            ),
+                            onPressed: () async {
+                              final ok = await _noiseService.enableRealMicrophone();
+                              if (mounted) {
+                                setState(() {});
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(ok
+                                        ? '🟢 Đã kích hoạt Micro phần cứng thành công!'
+                                        : '⚠️ Vui lòng cấp quyền Micro trong Cài đặt ứng dụng.'),
+                                    backgroundColor: ok ? AppTheme.accent : AppTheme.warning,
+                                  ),
+                                );
+                              }
+                            },
+                            child: const Text('Bật Micro Thật', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 14),
                   Row(
                     children: [

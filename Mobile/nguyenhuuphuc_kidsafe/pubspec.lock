@@ -26,12 +26,11 @@ packages:
     source: hosted
     version: "2.13.1"
   audio_streamer:
-    dependency: transitive
+    dependency: "direct overridden"
     description:
-      name: audio_streamer
-      sha256: "3cd4550110659e788ccc122f23770d43e3b81fda43c3e23d5999d04f08ef0768"
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/audio_streamer"
+      relative: true
+    source: path
     version: "5.0.0"
   boolean_selector:
     dependency: transitive

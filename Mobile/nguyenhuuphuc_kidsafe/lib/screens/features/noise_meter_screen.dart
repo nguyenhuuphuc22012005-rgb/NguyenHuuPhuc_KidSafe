@@ -262,44 +262,62 @@ class _NoiseMeterScreenState extends State<NoiseMeterScreen> {
               child: Column(
                 children: [
                   // Huy hiệu nguồn âm thanh thời gian thực
-                  Container(
-                    margin: const EdgeInsets.only(bottom: 18),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: _selectedSourceIndex == 0
-                          ? const Color(0xFFEFF6FF)
-                          : (noise.isRealMicrophone ? const Color(0xFFF0FDF4) : const Color(0xFFFFFBEB)),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(
+                  InkWell(
+                    onTap: _selectedSourceIndex == 1
+                        ? () async {
+                            final ok = await noise.enableRealMicrophone();
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(ok
+                                      ? '🟢 Đã kích hoạt Micro phần cứng thành công!'
+                                      : '⚠️ Hãy cấp quyền Micro trong Cài đặt thiết bị.'),
+                                  backgroundColor: ok ? AppTheme.accent : AppTheme.warning,
+                                ),
+                              );
+                            }
+                          }
+                        : null,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      margin: const EdgeInsets.only(bottom: 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
                         color: _selectedSourceIndex == 0
-                            ? const Color(0xFF3B82F6)
-                            : (noise.isRealMicrophone ? const Color(0xFF10B981) : const Color(0xFFF59E0B)),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          _selectedSourceIndex == 0 ? Icons.sensors_rounded : Icons.mic_rounded,
-                          size: 16,
+                            ? const Color(0xFFEFF6FF)
+                            : (noise.isRealMicrophone ? const Color(0xFFF0FDF4) : const Color(0xFFFFFBEB)),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
                           color: _selectedSourceIndex == 0
-                              ? const Color(0xFF1D4ED8)
-                              : (noise.isRealMicrophone ? const Color(0xFF059669) : const Color(0xFFD97706)),
+                              ? const Color(0xFF3B82F6)
+                              : (noise.isRealMicrophone ? const Color(0xFF10B981) : const Color(0xFFF59E0B)),
                         ),
-                        const SizedBox(width: 6),
-                        Text(
-                          _selectedSourceIndex == 0
-                              ? 'Thu Nhận Thời Gian Thực Từ Máy Bé'
-                              : (noise.isRealMicrophone ? 'Micro Môi Trường Thực Tế' : 'Chế Độ Thử Nghiệm Âm Thanh'),
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _selectedSourceIndex == 0 ? Icons.sensors_rounded : (noise.isRealMicrophone ? Icons.mic_rounded : Icons.mic_none_rounded),
+                            size: 16,
                             color: _selectedSourceIndex == 0
                                 ? const Color(0xFF1D4ED8)
-                                : (noise.isRealMicrophone ? const Color(0xFF047857) : const Color(0xFFB45309)),
+                                : (noise.isRealMicrophone ? const Color(0xFF059669) : const Color(0xFFD97706)),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 6),
+                          Text(
+                            _selectedSourceIndex == 0
+                                ? 'Thu Nhận Thời Gian Thực Từ Máy Bé'
+                                : (noise.isRealMicrophone ? 'Micro Thật: Đang Thu Âm' : 'Chưa nhận Mic (Bấm để kích hoạt)'),
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: _selectedSourceIndex == 0
+                                  ? const Color(0xFF1D4ED8)
+                                  : (noise.isRealMicrophone ? const Color(0xFF047857) : const Color(0xFFB45309)),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 

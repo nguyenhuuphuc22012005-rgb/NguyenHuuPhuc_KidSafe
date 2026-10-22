@@ -24,7 +24,7 @@ class NoiseService {
   double _targetDecibel = 38.0;
   bool _isMonitoring = false;
   bool _isRealMicrophone = false;
-  final List<double> _waveformHistory = List.filled(30, 38.0);
+  final List<double> _waveformHistory = List.filled(30, 38.0, growable: true);
 
   // Callback listeners
   final List<Function(double db, NoiseLevelCategory category)> _listeners = [];
@@ -51,20 +51,32 @@ class NoiseService {
   }
 
   /// Khởi động đo tiếng ồn từ Micro thực tế của thiết bị
-  Future<void> startMonitoring() async {
-    if (_isMonitoring) return;
+  Future<void> startMonitoring({bool force = false}) async {
+    if (_isMonitoring && !force) return;
+    if (force) {
+      stopMonitoring();
+    }
     _isMonitoring = true;
 
     // 1. Thử yêu cầu cấp quyền Micro trên điện thoại thật
     try {
-      final status = await Permission.microphone.request();
+      var status = await Permission.microphone.status;
+      if (!status.isGranted) {
+        status = await Permission.microphone.request();
+      }
+
       if (status.isGranted) {
+        _noiseSubscription?.cancel();
+        _fallbackTimer?.cancel();
+        _fallbackTimer = null;
+
         _noiseMeter = NoiseMeter();
         _noiseSubscription = _noiseMeter!.noise.listen(
           (NoiseReading reading) {
             _onRealNoiseReading(reading);
           },
           onError: (Object error) {
+            _isRealMicrophone = false;
             _startFallbackSimulation();
           },
           cancelOnError: false,
@@ -74,23 +86,47 @@ class NoiseService {
       }
     } catch (_) {}
 
-    // Fallback: Khi chạy trên desktop/máy ảo không có micro phần cứng
+    // Fallback: Khi chạy trên desktop/máy ảo không có micro phần cứng hoặc chưa cấp quyền
     _startFallbackSimulation();
+  }
+
+  /// Kích hoạt lại Micro phần cứng thật và xin cấp quyền nếu bị chặn
+  Future<bool> enableRealMicrophone() async {
+    var status = await Permission.microphone.status;
+    if (status.isPermanentlyDenied) {
+      await openAppSettings();
+      return false;
+    }
+
+    if (!status.isGranted) {
+      status = await Permission.microphone.request();
+    }
+
+    if (status.isGranted) {
+      await startMonitoring(force: true);
+      return _isRealMicrophone;
+    }
+
+    return false;
   }
 
   void _onRealNoiseReading(NoiseReading reading) {
     _isRealMicrophone = true;
-    double rawDb = reading.meanDecibel;
-    if (!rawDb.isFinite || rawDb.isNaN) {
-      rawDb = reading.maxDecibel;
+    _fallbackTimer?.cancel();
+    _fallbackTimer = null;
+
+    // Sử dụng maxDecibel để phản hồi ngay lập tức khi có người nói hoặc âm thanh xung quanh
+    double rawDb = reading.maxDecibel;
+    if (!rawDb.isFinite || rawDb.isNaN || rawDb < 20.0) {
+      rawDb = reading.meanDecibel;
     }
     if (!rawDb.isFinite || rawDb.isNaN) return;
 
-    // Điều chỉnh giới hạn thang đo tiếng ồn môi trường thực tế (20 - 120 dB)
-    final measuredDb = rawDb.clamp(20.0, 115.0);
+    // Điều chỉnh giới hạn thang đo tiếng ồn môi trường thực tế (25 - 115 dB)
+    final measuredDb = rawDb.clamp(25.0, 115.0);
 
-    // Làm dịu tín hiệu âm thanh để giao diện phản hồi mượt mà
-    _currentDecibel = (_currentDecibel * 0.35) + (measuredDb * 0.65);
+    // Phản hồi nhạy bén theo thời gian thực (75% tín hiệu tức thời, 25% làm mịn)
+    _currentDecibel = (_currentDecibel * 0.25) + (measuredDb * 0.75);
 
     _waveformHistory.add(_currentDecibel);
     if (_waveformHistory.length > 30) {

@@ -123,6 +123,13 @@ class NoiseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<bool> enableRealMicrophone() async {
+    _isMonitoring = true;
+    final res = await _noiseService.enableRealMicrophone();
+    notifyListeners();
+    return res;
+  }
+
   void stopMonitoring() {
     _isMonitoring = false;
     _noiseService.stopMonitoring();
