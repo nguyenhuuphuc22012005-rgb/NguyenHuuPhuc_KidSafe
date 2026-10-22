@@ -66,6 +66,7 @@ class AppEntryRouter extends StatelessWidget {
       return const ChildDeviceScreen();
     } else {
       return const ParentHomeScreen();
+
     }
   }
 }

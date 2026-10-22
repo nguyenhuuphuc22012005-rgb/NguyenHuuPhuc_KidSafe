@@ -30,7 +30,7 @@ class NoiseLogModel {
   factory NoiseLogModel.fromJson(Map<String, dynamic> json) {
     return NoiseLogModel(
       id: json['id'] ?? '',
-      childId: json['child_id'] ?? '',
+      childId: json['childId'] ?? json['child_id'] ?? '',
       decibel: (json['decibel'] as num?)?.toDouble() ?? 40.0,
       status: json['status'] ?? 'Normal',
       timestamp: json['timestamp'] ?? '',
@@ -41,6 +41,7 @@ class NoiseLogModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'childId': childId,
       'child_id': childId,
       'decibel': decibel,
       'status': status,

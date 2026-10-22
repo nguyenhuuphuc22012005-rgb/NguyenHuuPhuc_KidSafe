@@ -1,4 +1,6 @@
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -53,7 +55,12 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+        options.JsonSerializerOptions.Converters.Add(new BooleanJsonConverter());
+    });
 
 // 5. Cấu hình Swagger / OpenAPI Documentation
 builder.Services.AddEndpointsApiExplorer();
@@ -125,3 +132,23 @@ Console.WriteLine("    Swagger UI: http://localhost:8000/swagger             ");
 Console.WriteLine("==========================================================");
 
 app.Run();
+
+public class BooleanJsonConverter : JsonConverter<bool>
+{
+    public override bool Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        return reader.TokenType switch
+        {
+            JsonTokenType.True => true,
+            JsonTokenType.False => false,
+            JsonTokenType.Number => reader.GetInt32() != 0,
+            JsonTokenType.String => bool.TryParse(reader.GetString(), out var b) ? b : reader.GetString() == "1",
+            _ => false
+        };
+    }
+
+    public override void Write(Utf8JsonWriter writer, bool value, JsonSerializerOptions options)
+    {
+        writer.WriteBooleanValue(value);
+    }
+}

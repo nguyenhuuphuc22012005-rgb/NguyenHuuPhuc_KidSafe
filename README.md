@@ -1,11 +1,21 @@
 # 🛡️ KidSafe - Ứng Dụng Giám Sát & Bảo Vệ Điện Thoại Trẻ Em
 
-**Đồ án môn học:** Lập trình di động  
-**Sinh viên thực hiện:** Nguyễn Hữu Phúc  
-**Kiến trúc hệ thống:** Mô hình 3 lớp (3-Tier Architecture) Chuẩn Báo Cáo & Thuyết Trình:  
-- **Client Tier:** Flutter 3 (App Phụ Huynh & App Trẻ Em đa nền tảng)  
-- **Server Tier:** ASP.NET Core 9 Web API (C# .NET 9, JWT Bearer, Gmail SMTP OTP) *(Kèm FastAPI dự phòng)*  
-- **Database Tier:** Microsoft SQL Server 2022 (`KidSafeDb` với script `NguyenHuuPhuc_KidSafe.sql`)  
+[![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)](https://flutter.dev)
+[![Dart](https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white)](https://dart.dev)
+[![.NET 9](https://img.shields.io/badge/.NET_9.0-512BD4?style=for-the-badge&logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
+[![C#](https://img.shields.io/badge/C%23-239120?style=for-the-badge&logo=csharp&logoColor=white)](https://docs.microsoft.com/en-us/dotnet/csharp/)
+[![SQL Server 2022](https://img.shields.io/badge/SQL_Server_2022-CC2927?style=for-the-badge&logo=microsoftsqlserver&logoColor=white)](https://www.microsoft.com/sql-server/)
+[![JWT Auth](https://img.shields.io/badge/JWT-Authentication-black?style=for-the-badge&logo=JSON%20web%20tokens)](https://jwt.io)
+[![Swagger](https://img.shields.io/badge/Swagger-API_Docs-85EA2D?style=for-the-badge&logo=swagger&logoColor=black)](http://localhost:8000/swagger)
+
+> **Đồ án môn học:** Lập trình di động (LTDD)  
+> **Sinh viên thực hiện:** Nguyễn Hữu Phúc  
+> **GitHub:** [nguyenhuuphuc22012005-rgb](https://github.com/nguyenhuuphuc22012005-rgb)  
+> **Email:** nguyenhuuphuc22012005@gmail.com  
+> **Kiến trúc hệ thống:** Mô hình 3 lớp (3-Tier Architecture) Chuẩn Báo Cáo & Thuyết Trình:  
+> - **Client Tier:** Flutter 3 (App Phụ Huynh & App Trẻ Em đa nền tảng)  
+> - **Server Tier:** ASP.NET Core 9 Web API (C# .NET 9, JWT Bearer, Gmail SMTP OTP)  
+> - **Database Tier:** Microsoft SQL Server 2022 (`NguyenHuuPhucDb` với script `NguyenHuuPhuc_KidSafe.sql`)  
 
 ---
 
@@ -38,7 +48,7 @@
 ┌────────────────────────────────────────────────────────────────────────┐
 │                   TẦNG DỮ LIỆU (MICROSOFT SQL SERVER)                  │
 ├────────────────────────────────────────────────────────────────────────┤
-│  Cơ sở dữ liệu: KidSafeDb                                              │
+│  Cơ sở dữ liệu: NguyenHuuPhucDb                                              │
 │  - Users: Tài khoản, mật khẩu băm, mã OTP, Role                        │
 │  - Children: Thiết bị trẻ em, pin, tọa độ GPS, độ ồn, ghép nối        │
 │  - Geofences: Vùng an toàn bán kính 50-1000m                           │
@@ -74,7 +84,7 @@ Double-click vào file:
 START_PROJECT.bat
 ```
 * Bấm phím `[1]` để khởi động **ASP.NET Core 9 Web API** (Lắng nghe cổng `8000`, kết nối SQL Server).
-* Bấm phím `[2]` để nạp CSDL `KidSafeDb` vào SQL Server qua `sqlcmd`.
+* Bấm phím `[2]` để nạp CSDL `NguyenHuuPhucDb` vào SQL Server qua `sqlcmd`.
 * Bấm phím `[3]` để mở Mobile App trên Windows Desktop.
 * Bấm phím `[4]` để mở Mobile App trên Trình duyệt Web (Chrome).
 * Bấm phím `[7]` để mở Swagger UI xem tài liệu API (`http://localhost:8000/swagger`).

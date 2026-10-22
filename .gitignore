@@ -1,20 +1,24 @@
 # .NET / C#
-bin/
-obj/
+**/bin/
+**/obj/
 *.user
 *.suo
 .vs/
+**/.vs/
 
 # Flutter / Dart
-.dart_tool/
+**/.dart_tool/
 .packages
-build/
+**/build/
 .flutter-plugins
 .flutter-plugins-dependencies
-windows/flutter/ephemeral/
+**/windows/flutter/ephemeral/
+**/linux/flutter/ephemeral/
+**/macos/Flutter/ephemeral/
+**/ios/Flutter/ephemeral/
 
 # Python
-__pycache__/
+**/__pycache__/
 *.pyc
 *.pyo
 venv/
@@ -23,5 +27,7 @@ venv/
 # IDE / OS
 .DS_Store
 Thumbs.db
-.idea/
-.vscode/
+**/.idea/
+**/.vscode/
+*.iml
+

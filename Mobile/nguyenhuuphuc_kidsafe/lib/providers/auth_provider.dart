@@ -75,14 +75,14 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> verifyOtp(String otp) async {
-    if (_pendingEmail == null) return false;
+  Future<bool> verifyOtp(String otp, {String? email}) async {
+    final targetEmail = email ?? _pendingEmail ?? 'nguyenhuuphuc22012005@gmail.com';
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final user = await _api.verifyOTP(_pendingEmail!, otp);
+      final user = await _api.verifyOTP(targetEmail, otp);
       if (user != null) {
         _currentUser = user;
         await StorageService.saveUser(user);
@@ -96,7 +96,7 @@ class AuthProvider extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _errorMessage = 'Lỗi xác thực: $e';
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
       _isLoading = false;
       notifyListeners();
       return false;

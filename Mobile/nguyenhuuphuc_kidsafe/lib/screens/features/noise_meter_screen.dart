@@ -20,7 +20,12 @@ class _NoiseMeterScreenState extends State<NoiseMeterScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<NoiseProvider>(context, listen: false).startMonitoring();
+      final noiseProv = Provider.of<NoiseProvider>(context, listen: false);
+      noiseProv.startMonitoring();
+      final child = Provider.of<ChildrenProvider>(context, listen: false).selectedChild;
+      if (child != null) {
+        noiseProv.loadLogs(child.id);
+      }
     });
   }
 

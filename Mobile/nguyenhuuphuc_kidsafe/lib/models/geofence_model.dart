@@ -24,28 +24,33 @@ class GeofenceModel {
   factory GeofenceModel.fromJson(Map<String, dynamic> json) {
     return GeofenceModel(
       id: json['id'] ?? '',
-      childId: json['child_id'] ?? '',
+      childId: json['childId'] ?? json['child_id'] ?? '',
       name: json['name'] ?? '',
       latitude: (json['latitude'] as num?)?.toDouble() ?? 10.7769,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 106.7009,
-      radiusMeters: (json['radius_meters'] as num?)?.toDouble() ?? 200.0,
-      isActive: json['is_active'] == 1 || json['is_active'] == true,
-      notifyOnExit: json['notify_on_exit'] == 1 || json['notify_on_exit'] == true,
-      notifyOnEntry: json['notify_on_entry'] == 1 || json['notify_on_entry'] == true,
+      radiusMeters: (json['radiusMeters'] ?? json['radius_meters'] as num?)?.toDouble() ?? 200.0,
+      isActive: json['isActive'] == true || json['is_active'] == true || json['is_active'] == 1,
+      notifyOnExit: json['notifyOnExit'] == true || json['notify_on_exit'] == true || json['notify_on_exit'] == 1,
+      notifyOnEntry: json['notifyOnEntry'] == true || json['notify_on_entry'] == true || json['notify_on_entry'] == 1,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'childId': childId,
       'child_id': childId,
       'name': name,
       'latitude': latitude,
       'longitude': longitude,
+      'radiusMeters': radiusMeters,
       'radius_meters': radiusMeters,
-      'is_active': isActive ? 1 : 0,
-      'notify_on_exit': notifyOnExit ? 1 : 0,
-      'notify_on_entry': notifyOnEntry ? 1 : 0,
+      'isActive': isActive,
+      'is_active': isActive,
+      'notifyOnExit': notifyOnExit,
+      'notify_on_exit': notifyOnExit,
+      'notifyOnEntry': notifyOnEntry,
+      'notify_on_entry': notifyOnEntry,
     };
   }
 

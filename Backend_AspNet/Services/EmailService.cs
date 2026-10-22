@@ -89,7 +89,7 @@ namespace KidSafe.Api.Services
                 {
                     Credentials = new NetworkCredential(SenderEmail, SenderPassword),
                     EnableSsl = true,
-                    Timeout = 12000
+                    Timeout = 30000
                 };
 
                 await client.SendMailAsync(message);

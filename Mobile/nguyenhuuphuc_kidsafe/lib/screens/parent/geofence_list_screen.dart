@@ -6,8 +6,22 @@ import '../../providers/geofence_provider.dart';
 import '../../theme/app_theme.dart';
 import 'geofence_form_screen.dart';
 
-class GeofenceListScreen extends StatelessWidget {
+class GeofenceListScreen extends StatefulWidget {
   const GeofenceListScreen({super.key});
+
+  @override
+  State<GeofenceListScreen> createState() => _GeofenceListScreenState();
+}
+
+class _GeofenceListScreenState extends State<GeofenceListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final childId = Provider.of<ChildrenProvider>(context, listen: false).selectedChild?.id ?? 'ch_01';
+      Provider.of<GeofenceProvider>(context, listen: false).loadGeofences(childId);
+    });
+  }
 
   void _confirmDelete(BuildContext context, GeofenceModel geo) {
     showDialog(

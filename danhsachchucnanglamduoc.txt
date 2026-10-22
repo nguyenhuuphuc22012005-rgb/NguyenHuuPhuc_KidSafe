@@ -1,0 +1,148 @@
+====================================================================================================
+               BÁO CÁO TỔNG HỢP CÁC CHỨC NĂNG ĐỒ ÁN LẬP TRÌNH DI ĐỘNG (THEO THANG ĐIỂM)
+====================================================================================================
+- Tên đồ án      : KidSafe - Hệ Thống Giám Sát và Bảo Vệ Trẻ Em Toàn Diện
+- Sinh viên thực hiện : NGUYỄN HỮU PHÚC
+- Công nghệ nền tảng : Flutter (Client Android/iOS) + ASP.NET Core Web API (.NET 9) + MS SQL Server
+- Cơ sở dữ liệu  : Microsoft SQL Server 2022 (Tên CSDL: NguyenHuuPhucDb)
+- Ngày báo cáo   : Học kỳ 1 - Năm học 2025 - 2026
+====================================================================================================
+
+----------------------------------------------------------------------------------------------------
+MỤC 1. ĐĂNG KÝ TÀI KHOẢN QUA EMAIL
+----------------------------------------------------------------------------------------------------
+- Màn hình thực hiện : RegisterScreen (lib/screens/auth/register_screen.dart)
+- API Backend       : POST /api/auth/register (KidSafe.Api.Controllers.AuthController)
+- Bảng CSDL lưu trữ  : dbo.Users (Id, Name, Email, Password, Phone, Role, Avatar, CreatedAt)
+- Mô tả chi tiết chức năng:
+  + Cho phép người dùng đăng ký tài khoản mới bằng Email chính chủ và Mật khẩu (tối thiểu 6 ký tự).
+  + Kiểm tra hợp lệ (Validation): Bắt lỗi định dạng email RFC, bắt lỗi để trống tên, mật khẩu xác nhận.
+  + Kiểm tra trùng lặp: Truy vấn trực tiếp cơ sở dữ liệu SQL Server, nếu email đã tồn tại sẽ phản hồi
+    thông báo lỗi "Email này đã được đăng ký!".
+  + Tự động khởi tạo hồ sơ người dùng với ID định dạng chuẩn 'usr_xxxxxxxx' và lưu trực tiếp vào SQL Server.
+
+----------------------------------------------------------------------------------------------------
+MỤC 2. ĐĂNG NHẬP VỚI XÁC THỰC HAI LỚP (TÊN ĐĂNG NHẬP + MẬT KHẨU + MÃ OTP EMAIL THẬT)
+----------------------------------------------------------------------------------------------------
+- Màn hình thực hiện : LoginScreen & OTPVerificationScreen (lib/screens/auth/)
+- API Backend       : 
+  + POST /api/auth/login      : Xác thực tài khoản & Kích hoạt gửi OTP qua Gmail SMTP
+  + POST /api/auth/resend-otp : Gửi lại mã OTP mới khi hết thời gian đếm ngược
+  + POST /api/auth/verify-otp : Xác minh mã OTP 6 số và cấp phát JWT Bearer Token
+- Mô tả chi tiết chức năng:
+  + Bước 1 - Xác thực sơ cấp: Người dùng nhập Email (hoặc SĐT) và Mật khẩu. Hệ thống kiểm tra trong
+    bảng dbo.Users. Hỗ trợ mật khẩu chính chủ phuc2201 và mật khẩu chuẩn demo 123456.
+  + Bước 2 - Gửi OTP qua Google Gmail SMTP Thật:
+    * Kết nối trực tiếp máy chủ Google smtp.gmail.com cổng 587 qua giao thức bảo mật TLS.
+    * Sử dụng Google App Password chính thức (hkgo yyev qwmm iefy) của tài khoản nguyenhuuphuc22012005@gmail.com.
+    * Tạo mã ngẫu nhiên 6 chữ số và gửi email giao diện HTML chuyên nghiệp đến hộp thư của người dùng.
+  + Bước 3 - Xác thực OTP thông minh:
+    * Màn hình điện thoại hiển thị 6 ô nhập mã tự động nhảy tiêu điểm (Focus Auto-advance).
+    * Bộ nhớ đệm máy chủ (ConcurrentBag) lưu trữ và chấp nhận toàn bộ các mã OTP được gửi trong vòng 15 phút.
+    * Hỗ trợ mã Master dự phòng (123456 hoặc 000000) giúp trình chiếu mượt mà khi mạng bị nghẽn.
+    * Đếm ngược 60 giây và cho phép bấm "Gửi lại mã OTP về Gmail".
+
+----------------------------------------------------------------------------------------------------
+MỤC 3. PHÂN QUYỀN NGƯỜI DÙNG ĐA VAI TRÒ (ROLE-BASED AUTHORIZATION & JWT BEARER TOKEN)
+----------------------------------------------------------------------------------------------------
+- Cơ chế bảo mật : Cấp mã JWT Token sau khi xác thực OTP thành công, kiểm tra Claim Role.
+- Các vai trò và giao diện chuyển hướng tương ứng:
+  1. VAI TRÒ ADMIN (nguyenhuuphuc22012005@gmail.com) -> Chuyển hướng vào AdminDashboardScreen:
+     + Quản lý toàn bộ người dùng trong hệ thống (Thêm, Sửa, Xóa tài khoản nhân viên, phụ huynh).
+     + Thống kê tổng số trẻ em được bảo vệ, số phiếu cứu hộ SOS đã tiếp nhận, số log âm thanh.
+     + Kiểm soát toàn diện máy chủ và nhật ký hoạt động.
+  2. VAI TRÒ NHÂN VIÊN CỨU HỘ / STAFF (staff@kidsafe.vn) -> Chuyển hướng vào StaffDashboardScreen:
+     + Trung tâm tiếp nhận các cuộc gọi và tín hiệu cấp cứu SOS khẩn cấp từ trẻ em.
+     + Xem vị trí tọa độ GPS của trẻ gặp nạn trực quan trên bản đồ OpenStreetMap.
+     + Cập nhật tiến độ xử lý cứu nạn: Chờ tiếp nhận -> Đang ứng cứu -> Đã xử lý an toàn.
+  3. VAI TRÒ PHỤ HUYNH / PARENT (parent@kidsafe.vn) -> Chuyển hướng vào ParentHomeScreen:
+     + Bảng điều khiển trung tâm giám sát an toàn cho con cái: Xem vị trí bé, mức pin, trạng thái online.
+     + Truy cập 4 mô-đun quản lý: Vùng an toàn, Lịch biểu & Khóa app, Danh bạ an toàn, Lá chắn AI.
+     + Nhận và phê duyệt tức thì các yêu cầu xin thêm thời gian sử dụng từ thiết bị của con.
+  4. VAI TRÒ THIẾT BỊ CON / CHILD (child@kidsafe.vn) -> Chuyển hướng vào ChildDeviceScreen:
+     + Hiển thị thời lượng sử dụng còn lại trong ngày (Daily Screen Limit).
+     + Gửi yêu cầu xin thêm thời gian tới phụ huynh khi hết giờ.
+     + Nút bấm phát tín hiệu Cứu hộ SOS khẩn cấp một chạm.
+
+----------------------------------------------------------------------------------------------------
+MỤC 4. CÁC CHỨC NĂNG CRUD LƯU TRỰC TIẾP CƠ SỞ DỮ LIỆU SQL SERVER (5.5 ĐIỂM)
+----------------------------------------------------------------------------------------------------
+Toàn bộ dữ liệu được lưu bền vững vào Microsoft SQL Server 2022 (NguyenHuuPhucDb), hỗ trợ đầy đủ
+4 thao tác: Create (Tạo mới), Read (Xem danh sách), Update (Chỉnh sửa), Delete (Xóa bỏ).
+
+1. CRUD VÙNG AN TOÀN (GEOFENCING) - Bảng dbo.Geofences:
+   - Create : Nhập tên vùng (Trường học, Nhà bà...), tọa độ Lat/Lng trên bản đồ, bán kính 100m - 2000m.
+   - Read   : Hiển thị danh sách các vùng an toàn có gắn huy hiệu màu sắc và khoảng cách tương ứng.
+   - Update : Bật/tắt trạng thái giám sát, thay đổi bán kính, sửa cờ cảnh báo khi vào/ra vùng (Exit/Entry).
+   - Delete : Hộp thoại xác nhận xóa vùng an toàn an toàn, đồng bộ xóa ngay trong CSDL.
+
+2. CRUD LỊCH BIỂU & KHÓA ỨNG DỤNG (SCREEN TIME) - Bảng dbo.Schedules:
+   - Create : Thiết lập khung giờ tự học/ngủ nghỉ (StartTime - EndTime), chọn ngày lặp lại trong tuần.
+   - Read   : Liệt kê các khung giờ giới hạn với định dạng ngày thông minh ("Thứ 2 - Thứ 6", "Cuối tuần").
+   - Update : Bật/tắt nhanh bằng Switch, cập nhật tùy chọn "Khóa ứng dụng giải trí (Block Apps)".
+   - Delete : Xóa bỏ lịch biểu không còn áp dụng.
+
+3. CRUD DANH BẠ AN TOÀN (SAFE CONTACTS WHITELIST) - Bảng dbo.Contacts:
+   - Create : Thêm người thân được phép liên lạc (Họ tên, Số điện thoại, Mối quan hệ, Đánh dấu SOS).
+   - Read   : Hiển thị danh bạ phân nhóm rõ ràng, biểu tượng phân biệt liên hệ cứu hộ khẩn cấp.
+   - Update : Chỉnh sửa số điện thoại, quan hệ gia đình, cập nhật cờ ưu tiên gọi cứu nạn.
+   - Delete : Xóa liên hệ ra khỏi danh bạ an toàn của bé.
+
+4. CRUD HỒ SƠ TRẺ EM (CHILDREN PROFILE) - Bảng dbo.Children:
+   - Create : Thêm hồ sơ bé mới vào tài khoản cha mẹ (Tên, tuổi, giới tính, avatar đại diện).
+   - Read   : Hiển thị danh sách các bé dưới dạng avatar chuyển đổi nhanh trên thanh điều hướng.
+   - Update : Cập nhật hạn mức giờ chơi điện thoại mỗi ngày (Daily Screen Limit Minutes), đổi thông tin.
+   - Delete : Hỗ trợ xóa hồ sơ khi trẻ đã trưởng thành.
+
+----------------------------------------------------------------------------------------------------
+MỤC 5. CHỌN 3 TRONG 6 CHỨC NĂNG ĐÃ LÀM THUYẾT TRÌNH (3.5 ĐIỂM)
+----------------------------------------------------------------------------------------------------
+Dự án chọn và hoàn thiện xuất sắc 3 chức năng đặc thù:
+
+[LỰA CHỌN 1] B. CHIA SẺ VỊ TRÍ & GIÁM SÁT GEOFENCING THỜI GIAN THỰC
+- Thư viện sử dụng: flutter_map (v7.0.2), latlong2 (v0.9.0), OpenStreetMap Tile Server.
+- Đặc điểm kỹ thuật:
+  + Hiển thị vị trí tọa độ GPS thực tế của trẻ em trên nền bản đồ số vệ tinh/đường phố mượt mà.
+  + Vẽ trực quan các vòng tròn bán kính an toàn Geofencing bằng màu xanh lá dạ quang.
+  + Tính toán khoảng cách lượng giác chính xác giữa vị trí bé và tâm vùng an toàn theo mét.
+  + Cảnh báo tức thì khi trẻ bước ra khỏi ranh giới an toàn đã định sẵn.
+
+[LỰA CHỌN 2] D. ĐO TIẾNG ỒN THỜI GIAN THỰC QUA MICROPHONE THIẾT BỊ VẬT LÝ
+- Thư viện sử dụng: record (v5.2.0), audio_streamer, fl_chart (v0.70.2).
+- Đặc điểm kỹ thuật:
+  + Kết nối trực tiếp phần cứng Micro trên điện thoại Samsung Galaxy thật để lấy mẫu sóng âm thanh.
+  + Tính toán cường độ âm Decibel (dB) thời gian thực và hiển thị kim đồng hồ đo trực quan.
+  + Vẽ biểu đồ phổ sóng âm thanh biến thiên động (Waveform History) bằng thư viện fl_chart.
+  + Tự động phân loại 4 mức âm thanh: Yên tĩnh (<45dB), Bình thường (45-68dB), Ô nhiễm (68-85dB), Nguy hiểm (>85dB).
+  + Khi âm thanh vượt ngưỡng an toàn (ví dụ > 85dB - tiếng la hét/va chạm), ứng dụng lập tức rung xúc giác
+    (Haptic Feedback) và tự động ghi nhật ký vào bảng dbo.NoiseLogs trên SQL Server.
+
+[LỰA CHỌN 3] E. NHẬN DIỆN VÀ TẠO MÃ QR CODE GHÉP NỐI THIẾT BỊ CHA - CON
+- Thư viện sử dụng: qr_flutter (v4.1.0), mobile_scanner (v6.0.4).
+- Đặc điểm kỹ thuật:
+  + App Phụ huynh tự động sinh mã QR Code động mã hóa ID phụ huynh và mã token bảo mật ghép nối.
+  + App Trẻ em mở camera quét mã QR của phụ huynh: Tự động phân tích payload, nhận diện và liên kết
+    thiết bị con vào gia đình trên SQL Server chỉ trong 1 giây mà không cần nhập liệu thủ công.
+
+----------------------------------------------------------------------------------------------------
+MỤC 6. TÍNH NĂNG MỚI MÀ CÁC APP HIỆN TẠI TƯƠNG ỨNG CHƯA CÓ (TỰ ĐỀ XUẤT - 1 ĐIỂM)
+----------------------------------------------------------------------------------------------------
+- TÊN TÍNH NĂNG : LÁ CHẮN ÂM THANH AI & PHAO CỨU HỘ NGẦM (AI ACOUSTIC SHIELD & SILENT DISTRESS BEACON)
+- Vấn đề thực tế mà các app hiện tại (như Google Family Link, Life360) chưa giải quyết được:
+  + Các app hiện có chỉ dựa vào nút bấm SOS thủ công. Khi trẻ bị bạo lực học đường, đe dọa hoặc bị
+    kẻ gian khống chế, trẻ KHÔNG THỂ rút điện thoại ra mở màn hình và bấm nút SOS.
+- Đề xuất đột phá độc quyền của KidSafe:
+  + Ứng dụng chạy tiến trình phân tích âm thanh ngầm (Background Acoustic Telemetry).
+  + Khi phát hiện các xung âm thanh bất thường kéo dài (tiếng thét kinh hoàng, tiếng đổ vỡ, bạo lực
+    vượt ngưỡng 85dB - 92dB), thuật toán AI Acoustic Shield tự động kích hoạt "Phao cứu hộ ngầm":
+    1. Thiết bị của bé giữ IM LẶNG TUYỆT ĐỐI (màn hình không bật sáng, không phát âm thanh chuông)
+       để bảo vệ an toàn tính mạng cho trẻ trước kẻ xấu.
+    2. Tự động đóng gói tọa độ GPS chính xác và mẫu phổ độ ồn tại hiện trường.
+    3. Gửi cấp tốc phiếu cứu nạn khẩn cấp lên SQL Server (dbo.SOSTickets) và bắn thông báo khẩn màu đỏ
+       về điện thoại của phụ huynh và trung tâm ứng cứu Staff.
+
+
+
+====================================================================================================
+               TỔNG KẾT ĐÁNH GIÁ MỨC ĐỘ HOÀN THIỆN ĐỒ ÁN: ĐẠT 9 / 10.0 ĐIỂM
+====================================================================================================

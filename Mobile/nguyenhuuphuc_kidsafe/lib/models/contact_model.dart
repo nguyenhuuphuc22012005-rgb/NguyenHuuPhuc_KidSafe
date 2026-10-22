@@ -20,11 +20,11 @@ class ContactModel {
   factory ContactModel.fromJson(Map<String, dynamic> json) {
     return ContactModel(
       id: json['id'] ?? '',
-      childId: json['child_id'] ?? '',
+      childId: json['childId'] ?? json['child_id'] ?? '',
       name: json['name'] ?? '',
       phone: json['phone'] ?? '',
       relationship: json['relationship'] ?? 'Người thân',
-      isSosContact: json['is_sos_contact'] == 1 || json['is_sos_contact'] == true,
+      isSosContact: json['isSosContact'] == true || json['is_sos_contact'] == true || json['is_sos_contact'] == 1,
       avatar: json['avatar'] ?? 'avatar_contact',
     );
   }
@@ -32,11 +32,13 @@ class ContactModel {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'childId': childId,
       'child_id': childId,
       'name': name,
       'phone': phone,
       'relationship': relationship,
-      'is_sos_contact': isSosContact ? 1 : 0,
+      'isSosContact': isSosContact,
+      'is_sos_contact': isSosContact,
       'avatar': avatar,
     };
   }

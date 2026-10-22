@@ -37,26 +37,31 @@ class ScheduleModel {
   factory ScheduleModel.fromJson(Map<String, dynamic> json) {
     return ScheduleModel(
       id: json['id'] ?? '',
-      childId: json['child_id'] ?? '',
+      childId: json['childId'] ?? json['child_id'] ?? '',
       title: json['title'] ?? '',
-      startTime: json['start_time'] ?? '19:00',
-      endTime: json['end_time'] ?? '21:00',
+      startTime: json['startTime'] ?? json['start_time'] ?? '19:00',
+      endTime: json['endTime'] ?? json['end_time'] ?? '21:00',
       days: json['days'] ?? 'Mon,Tue,Wed,Thu,Fri',
-      isActive: json['is_active'] == 1 || json['is_active'] == true,
-      blockApps: json['block_apps'] == 1 || json['block_apps'] == true,
+      isActive: json['isActive'] == true || json['is_active'] == true || json['is_active'] == 1,
+      blockApps: json['blockApps'] == true || json['block_apps'] == true || json['block_apps'] == 1,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'childId': childId,
       'child_id': childId,
       'title': title,
+      'startTime': startTime,
       'start_time': startTime,
+      'endTime': endTime,
       'end_time': endTime,
       'days': days,
-      'is_active': isActive ? 1 : 0,
-      'block_apps': blockApps ? 1 : 0,
+      'isActive': isActive,
+      'is_active': isActive,
+      'blockApps': blockApps,
+      'block_apps': blockApps,
     };
   }
 

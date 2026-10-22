@@ -7,6 +7,7 @@ import '../models/schedule_model.dart';
 import '../models/contact_model.dart';
 import '../models/sos_ticket_model.dart';
 import '../models/time_request_model.dart';
+import '../models/noise_log_model.dart';
 import 'mock_data_service.dart';
 
 class ApiService {
@@ -300,7 +301,7 @@ class ApiService {
   // --- GEOFENCES CRUD ---
   Future<List<GeofenceModel>> getGeofences(String childId) async {
     try {
-      final res = await http.get(Uri.parse('$baseUrl/api/geofences?child_id=$childId')).timeout(const Duration(seconds: 2));
+      final res = await _get('/api/geofences?child_id=$childId', timeout: const Duration(seconds: 4));
       if (res.statusCode == 200) {
         final List data = jsonDecode(utf8.decode(res.bodyBytes));
         return data.map((e) => GeofenceModel.fromJson(e)).toList();
@@ -311,11 +312,13 @@ class ApiService {
 
   Future<GeofenceModel> createGeofence(GeofenceModel geo) async {
     try {
-      await http.post(
-        Uri.parse('$baseUrl/api/geofences'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(geo.toJson()),
-      ).timeout(const Duration(seconds: 2));
+      final res = await _post('/api/geofences', geo.toJson(), timeout: const Duration(seconds: 4));
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        final created = GeofenceModel.fromJson(data);
+        _mock.geofences.insert(0, created);
+        return created;
+      }
     } catch (_) {}
     return _mock.createGeofence(
       childId: geo.childId,
@@ -330,18 +333,14 @@ class ApiService {
 
   Future<void> updateGeofence(GeofenceModel geo) async {
     try {
-      await http.put(
-        Uri.parse('$baseUrl/api/geofences/${geo.id}'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(geo.toJson()),
-      ).timeout(const Duration(seconds: 2));
+      await _put('/api/geofences/${geo.id}', geo.toJson(), timeout: const Duration(seconds: 4));
     } catch (_) {}
     _mock.updateGeofence(geo);
   }
 
   Future<void> deleteGeofence(String id) async {
     try {
-      await http.delete(Uri.parse('$baseUrl/api/geofences/$id')).timeout(const Duration(seconds: 2));
+      await _delete('/api/geofences/$id', timeout: const Duration(seconds: 4));
     } catch (_) {}
     _mock.deleteGeofence(id);
   }
@@ -349,7 +348,7 @@ class ApiService {
   // --- SCHEDULES CRUD ---
   Future<List<ScheduleModel>> getSchedules(String childId) async {
     try {
-      final res = await _get('/api/schedules?child_id=$childId', timeout: const Duration(seconds: 3));
+      final res = await _get('/api/schedules?child_id=$childId', timeout: const Duration(seconds: 4));
       if (res.statusCode == 200) {
         final List data = jsonDecode(utf8.decode(res.bodyBytes));
         return data.map((e) => ScheduleModel.fromJson(e)).toList();
@@ -360,8 +359,8 @@ class ApiService {
 
   Future<ScheduleModel> createSchedule(ScheduleModel sch) async {
     try {
-      final res = await _post('/api/schedules', sch.toJson(), timeout: const Duration(seconds: 3));
-      if (res.statusCode == 200) {
+      final res = await _post('/api/schedules', sch.toJson(), timeout: const Duration(seconds: 4));
+      if (res.statusCode == 200 || res.statusCode == 201) {
         final data = jsonDecode(utf8.decode(res.bodyBytes));
         final created = ScheduleModel.fromJson(data);
         _mock.schedules.insert(0, created);
@@ -380,14 +379,14 @@ class ApiService {
 
   Future<void> updateSchedule(ScheduleModel sch) async {
     try {
-      await _put('/api/schedules/${sch.id}', sch.toJson(), timeout: const Duration(seconds: 3));
+      await _put('/api/schedules/${sch.id}', sch.toJson(), timeout: const Duration(seconds: 4));
     } catch (_) {}
     _mock.updateSchedule(sch);
   }
 
   Future<void> deleteSchedule(String id) async {
     try {
-      await _delete('/api/schedules/$id', timeout: const Duration(seconds: 3));
+      await _delete('/api/schedules/$id', timeout: const Duration(seconds: 4));
     } catch (_) {}
     _mock.deleteSchedule(id);
   }
@@ -395,7 +394,7 @@ class ApiService {
   // --- CONTACTS CRUD ---
   Future<List<ContactModel>> getContacts(String childId) async {
     try {
-      final res = await _get('/api/contacts?child_id=$childId', timeout: const Duration(seconds: 3));
+      final res = await _get('/api/contacts?child_id=$childId', timeout: const Duration(seconds: 4));
       if (res.statusCode == 200) {
         final List data = jsonDecode(utf8.decode(res.bodyBytes));
         return data.map((e) => ContactModel.fromJson(e)).toList();
@@ -406,8 +405,8 @@ class ApiService {
 
   Future<ContactModel> createContact(ContactModel con) async {
     try {
-      final res = await _post('/api/contacts', con.toJson(), timeout: const Duration(seconds: 3));
-      if (res.statusCode == 200) {
+      final res = await _post('/api/contacts', con.toJson(), timeout: const Duration(seconds: 4));
+      if (res.statusCode == 200 || res.statusCode == 201) {
         final data = jsonDecode(utf8.decode(res.bodyBytes));
         final created = ContactModel.fromJson(data);
         _mock.contacts.insert(0, created);
@@ -426,14 +425,14 @@ class ApiService {
 
   Future<void> updateContact(ContactModel con) async {
     try {
-      await _put('/api/contacts/${con.id}', con.toJson(), timeout: const Duration(seconds: 3));
+      await _put('/api/contacts/${con.id}', con.toJson(), timeout: const Duration(seconds: 4));
     } catch (_) {}
     _mock.updateContact(con);
   }
 
   Future<void> deleteContact(String id) async {
     try {
-      await _delete('/api/contacts/$id', timeout: const Duration(seconds: 3));
+      await _delete('/api/contacts/$id', timeout: const Duration(seconds: 4));
     } catch (_) {}
     _mock.deleteContact(id);
   }
@@ -441,7 +440,7 @@ class ApiService {
   // --- SOS TICKETS ---
   Future<List<SOSTicketModel>> getSOSTickets() async {
     try {
-      final res = await http.get(Uri.parse('$baseUrl/api/sos')).timeout(const Duration(seconds: 2));
+      final res = await _get('/api/sos', timeout: const Duration(seconds: 4));
       if (res.statusCode == 200) {
         final List data = jsonDecode(utf8.decode(res.bodyBytes));
         return data.map((e) => SOSTicketModel.fromJson(e)).toList();
@@ -450,19 +449,66 @@ class ApiService {
     return _mock.getSOSTickets();
   }
 
+  Future<SOSTicketModel> createSOSTicket(SOSTicketModel ticket) async {
+    try {
+      final res = await _post('/api/sos', ticket.toJson(), timeout: const Duration(seconds: 4));
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        final created = SOSTicketModel.fromJson(data);
+        _mock.sosTickets.insert(0, created);
+        return created;
+      }
+    } catch (_) {}
+    return _mock.createSOSTicket(
+      childId: ticket.childId,
+      childName: ticket.childName,
+      parentName: ticket.parentName,
+      parentPhone: ticket.parentPhone,
+      latitude: ticket.latitude,
+      longitude: ticket.longitude,
+      noiseLevel: ticket.noiseLevel,
+      reason: ticket.reason,
+    );
+  }
+
   Future<void> updateSOSTicketStatus(String id, String status, {String? staffId, String? notes}) async {
     try {
-      await http.put(
-        Uri.parse('$baseUrl/api/sos/$id'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
+      await _put(
+        '/api/sos/$id',
+        {
           'status': status,
+          'assignedStaffId': staffId,
           'assigned_staff_id': staffId,
+          'resolutionNotes': notes,
           'resolution_notes': notes,
-        }),
-      ).timeout(const Duration(seconds: 2));
+        },
+        timeout: const Duration(seconds: 4),
+      );
     } catch (_) {}
     _mock.updateSOSTicketStatus(id, status, staffId: staffId, notes: notes);
+  }
+
+  // --- NOISE LOGS CRUD ---
+  Future<NoiseLogModel?> addNoiseLog(NoiseLogModel log) async {
+    try {
+      final res = await _post('/api/noise', log.toJson(), timeout: const Duration(seconds: 4));
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        return NoiseLogModel.fromJson(data);
+      }
+    } catch (_) {}
+    return null;
+  }
+
+  Future<List<NoiseLogModel>> getNoiseLogs(String childId) async {
+    try {
+      final res = await _get('/api/noise?child_id=$childId', timeout: const Duration(seconds: 4));
+      if (res.statusCode == 200) {
+        final List data = jsonDecode(utf8.decode(res.bodyBytes));
+        return data.map((e) => NoiseLogModel.fromJson(e)).toList();
+      }
+    } catch (_) {}
+    return _mock.getNoiseLogs(childId);
   }
 
   // --- REAL-TIME NOISE TELEMETRY ---

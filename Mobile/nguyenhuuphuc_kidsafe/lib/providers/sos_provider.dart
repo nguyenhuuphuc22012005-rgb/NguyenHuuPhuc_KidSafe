@@ -29,7 +29,7 @@ class SOSProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void createSOS({
+  Future<void> createSOS({
     required String childId,
     required String childName,
     String? parentName,
@@ -38,8 +38,9 @@ class SOSProvider extends ChangeNotifier {
     required double longitude,
     double noiseLevel = 0.0,
     required String reason,
-  }) {
-    final ticket = _mock.createSOSTicket(
+  }) async {
+    final newTicket = SOSTicketModel(
+      id: '',
       childId: childId,
       childName: childName,
       parentName: parentName,
@@ -48,8 +49,11 @@ class SOSProvider extends ChangeNotifier {
       longitude: longitude,
       noiseLevel: noiseLevel,
       reason: reason,
+      status: 'pending',
+      createdAt: DateTime.now().toIso8601String(),
     );
-    _tickets.insert(0, ticket);
+    final created = await _api.createSOSTicket(newTicket);
+    _tickets.insert(0, created);
     notifyListeners();
   }
 

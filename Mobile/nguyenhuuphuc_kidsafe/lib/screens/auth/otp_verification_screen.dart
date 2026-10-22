@@ -85,7 +85,7 @@ class _OTPVerificationScreenState extends State<OTPVerificationScreen> {
     }
 
     final auth = Provider.of<AuthProvider>(context, listen: false);
-    final success = await auth.verifyOtp(otp);
+    final success = await auth.verifyOtp(otp, email: widget.email);
 
     if (success && mounted) {
       final user = auth.currentUser;

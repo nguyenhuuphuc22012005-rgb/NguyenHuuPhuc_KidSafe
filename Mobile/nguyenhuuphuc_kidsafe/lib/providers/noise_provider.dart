@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/noise_log_model.dart';
+import '../models/sos_ticket_model.dart';
+import '../services/api_service.dart';
 import '../services/mock_data_service.dart';
 import '../services/noise_service.dart';
 
@@ -11,6 +13,7 @@ class NoiseProvider extends ChangeNotifier {
 
   final NoiseService _noiseService = NoiseService();
   final MockDataService _mock = MockDataService();
+  final ApiService _api = ApiService();
 
   double _currentDecibel = 42.0;
   NoiseLevelCategory _category = NoiseLevelCategory.normal;
@@ -60,6 +63,14 @@ class NoiseProvider extends ChangeNotifier {
 
         // Tự động ghi nhật ký và tạo ticket cứu hộ nếu ở mức nguy hiểm
         _mock.addNoiseLog('ch_01', db, cat.name, 'Vượt ngưỡng thiết lập (${_warningThreshold.toStringAsFixed(0)} dB)');
+        _api.addNoiseLog(NoiseLogModel(
+          id: '',
+          childId: 'ch_01',
+          decibel: db,
+          status: cat.name,
+          timestamp: DateTime.now().toIso8601String(),
+          note: 'Vượt ngưỡng thiết lập (${_warningThreshold.toStringAsFixed(0)} dB)',
+        ));
 
         if (_aiShieldEnabled && db >= 85) {
           _mock.createSOSTicket(
@@ -70,6 +81,19 @@ class NoiseProvider extends ChangeNotifier {
             noiseLevel: db,
             reason: 'Phát hiện tiếng ồn vượt ngưỡng cảnh báo (${db.toStringAsFixed(1)} dB >= ${_warningThreshold.toStringAsFixed(0)} dB)',
           );
+          _api.createSOSTicket(SOSTicketModel(
+            id: '',
+            childId: 'ch_01',
+            childName: 'Bé Bo (Gia Bảo)',
+            parentName: 'Nguyễn Hữu Phúc',
+            parentPhone: '0988776655',
+            latitude: 10.7769,
+            longitude: 106.7009,
+            noiseLevel: db,
+            reason: 'AI Acoustic Shield: Phát hiện tiếng ồn vượt ngưỡng cảnh báo (${db.toStringAsFixed(1)} dB >= ${_warningThreshold.toStringAsFixed(0)} dB)',
+            status: 'pending',
+            createdAt: DateTime.now().toIso8601String(),
+          ));
         }
       }
 
@@ -157,12 +181,41 @@ class NoiseProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  final Map<String, List<NoiseLogModel>> _logsCache = {};
+
+  Future<void> loadLogs(String childId) async {
+    try {
+      final list = await _api.getNoiseLogs(childId);
+      if (list.isNotEmpty) {
+        _logsCache[childId] = list;
+        notifyListeners();
+      }
+    } catch (_) {}
+  }
+
   List<NoiseLogModel> getLogs(String childId) {
+    if (_logsCache.containsKey(childId) && _logsCache[childId]!.isNotEmpty) {
+      return _logsCache[childId]!;
+    }
     return _mock.getNoiseLogs(childId);
   }
 
-  void addLog(String childId, String note) {
+  Future<void> addLog(String childId, String note) async {
+    final nowStr = DateTime.now().toIso8601String();
     _mock.addNoiseLog(childId, _currentDecibel, _category.name, note);
+    final log = NoiseLogModel(
+      id: '',
+      childId: childId,
+      decibel: _currentDecibel,
+      status: _category.name,
+      timestamp: nowStr,
+      note: note,
+    );
+    final created = await _api.addNoiseLog(log);
+    if (created != null) {
+      _logsCache.putIfAbsent(childId, () => []);
+      _logsCache[childId]!.insert(0, created);
+    }
     notifyListeners();
   }
 }

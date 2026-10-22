@@ -196,6 +196,13 @@ namespace KidSafe.Api.Controllers
         }
     }
 
+    public class SOSTicketUpdateDto
+    {
+        public string? Status { get; set; }
+        public string? AssignedStaffId { get; set; }
+        public string? ResolutionNotes { get; set; }
+    }
+
     // ==================== 5. SOS TICKETS ====================
     [ApiController]
     [Route("api/[controller]")]
@@ -221,17 +228,27 @@ namespace KidSafe.Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, [FromBody] SOSTicket ticket)
+        public async Task<IActionResult> Update(string id, [FromBody] SOSTicketUpdateDto dto)
         {
             var existing = await _db.SOSTickets.FindAsync(id);
             if (existing == null) return NotFound();
 
-            if (!string.IsNullOrWhiteSpace(ticket.Status)) existing.Status = ticket.Status;
-            if (ticket.AssignedStaffId != null) existing.AssignedStaffId = ticket.AssignedStaffId;
-            if (ticket.ResolutionNotes != null) existing.ResolutionNotes = ticket.ResolutionNotes;
+            if (!string.IsNullOrWhiteSpace(dto.Status)) existing.Status = dto.Status;
+            if (dto.AssignedStaffId != null) existing.AssignedStaffId = dto.AssignedStaffId;
+            if (dto.ResolutionNotes != null) existing.ResolutionNotes = dto.ResolutionNotes;
 
             await _db.SaveChangesAsync();
             return Ok(existing);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(string id)
+        {
+            var existing = await _db.SOSTickets.FindAsync(id);
+            if (existing == null) return NotFound();
+            _db.SOSTickets.Remove(existing);
+            await _db.SaveChangesAsync();
+            return Ok(new { status = "success" });
         }
     }
 

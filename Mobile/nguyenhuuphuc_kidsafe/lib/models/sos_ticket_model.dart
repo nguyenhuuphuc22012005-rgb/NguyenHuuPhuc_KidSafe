@@ -49,35 +49,43 @@ class SOSTicketModel {
   factory SOSTicketModel.fromJson(Map<String, dynamic> json) {
     return SOSTicketModel(
       id: json['id'] ?? '',
-      childId: json['child_id'] ?? '',
-      childName: json['child_name'] ?? '',
-      parentName: json['parent_name'],
-      parentPhone: json['parent_phone'],
+      childId: json['childId'] ?? json['child_id'] ?? '',
+      childName: json['childName'] ?? json['child_name'] ?? '',
+      parentName: json['parentName'] ?? json['parent_name'],
+      parentPhone: json['parentPhone'] ?? json['parent_phone'],
       latitude: (json['latitude'] as num?)?.toDouble() ?? 10.7769,
       longitude: (json['longitude'] as num?)?.toDouble() ?? 106.7009,
-      noiseLevel: (json['noise_level'] as num?)?.toDouble() ?? 0.0,
+      noiseLevel: (json['noiseLevel'] ?? json['noise_level'] as num?)?.toDouble() ?? 0.0,
       reason: json['reason'] ?? '',
       status: json['status'] ?? 'pending',
-      assignedStaffId: json['assigned_staff_id'],
-      resolutionNotes: json['resolution_notes'],
-      createdAt: json['created_at'] ?? '',
+      assignedStaffId: json['assignedStaffId'] ?? json['assigned_staff_id'],
+      resolutionNotes: json['resolutionNotes'] ?? json['resolution_notes'],
+      createdAt: json['createdAt'] ?? json['created_at'] ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'childId': childId,
       'child_id': childId,
+      'childName': childName,
       'child_name': childName,
+      'parentName': parentName,
       'parent_name': parentName,
+      'parentPhone': parentPhone,
       'parent_phone': parentPhone,
       'latitude': latitude,
       'longitude': longitude,
+      'noiseLevel': noiseLevel,
       'noise_level': noiseLevel,
       'reason': reason,
       'status': status,
+      'assignedStaffId': assignedStaffId,
       'assigned_staff_id': assignedStaffId,
+      'resolutionNotes': resolutionNotes,
       'resolution_notes': resolutionNotes,
+      'createdAt': createdAt,
       'created_at': createdAt,
     };
   }
